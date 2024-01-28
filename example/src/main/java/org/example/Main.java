@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -8,12 +9,32 @@ public class Main {
     public static void main(String[] args) {
         //inputData();
         //simpleArray();
+        sortPerson();
 
-        Person p = new Person();
-        p.setLastName("Марко");
-        p.setFirstName("Мурчик");
-        System.out.println(p);
+    }
 
+    private static void sortPerson() {
+        Person[] list = {
+                new Person("Мудрик", "Капітанов"),
+                new Person("Андрій", "Жулік"),
+                new Person("Петро", "Рогатка"),
+                new Person("Микола", "Підкаблучник"),
+        };
+        System.out.println("---Звичайний список---");
+        for (var item : list) {
+            System.out.println(item);
+        }
+//        Arrays.sort(list, new Comparator<Person>() {
+//            @Override
+//            public int compare(Person o1, Person o2) {
+//                return o1.getLastName().compareTo(o2.getLastName());
+//            }
+//        });
+        Arrays.sort(list);
+        System.out.println("---Сортований список---");
+        for (var item : list) {
+            System.out.println(item);
+        }
     }
 
     private static void simpleArray() {
