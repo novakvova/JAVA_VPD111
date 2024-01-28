@@ -1,5 +1,9 @@
 package org.example;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
@@ -9,8 +13,59 @@ public class Main {
     public static void main(String[] args) {
         //inputData();
         //simpleArray();
-        sortPerson();
+        //sortPerson();
+        String userName = "root";
+        String password ="123456";
+        String host="localhost";
+        String port="3306";
+        String database="java_vpd111";
+        String strConn = "jdbc:mariadb://"+host+":"+port+"/"+database;
+        //createNewTable(strConn, userName, password);
+        insertCategory(strConn,userName,password);
+    }
 
+    private static void insertCategory(String strConn, String userName, String password) {
+        Scanner input = new Scanner(System.in);
+        CategoryCreate categoryCreate = new CategoryCreate();
+        System.out.println("Вкажіть назву категорії:");
+        categoryCreate.setName(input.nextLine());
+        System.out.println("Вкажіть опис категорії:");
+        categoryCreate.setDescription(input.nextLine());
+
+        try(Connection conn = DriverManager.getConnection(strConn,userName,password)) {
+            Statement statement = conn.createStatement();
+            String insertQuery = "INSERT INTO categories (name, description) VALUES (?, ?)";
+            // Create a PreparedStatement
+            PreparedStatement preparedStatement = conn.prepareStatement(insertQuery);
+            // Set values for the placeholders
+            preparedStatement.setString(1, categoryCreate.getName());
+            preparedStatement.setString(2, categoryCreate.getDescription());
+            // Execute the SQL query
+            int rowsAffected = preparedStatement.executeUpdate();
+            // Close the resources
+            preparedStatement.close();
+            System.out.println("Rows affected: " + rowsAffected);
+            System.out.println("Category inserted successfully.");
+        }
+        catch(Exception ex) {
+            System.out.println("Помилка створення категорії: "+ex.getMessage());
+        }
+    }
+    private static void createNewTable(String strConn, String userName, String password) {
+        try(Connection conn = DriverManager.getConnection(strConn,userName,password)){
+            Statement statement = conn.createStatement();
+            String sql = "CREATE TABLE IF NOT EXISTS categories ("
+                    + "id INT AUTO_INCREMENT PRIMARY KEY,"
+                    + "name VARCHAR(255) NOT NULL,"
+                    + "description TEXT"
+                    + ")";
+            statement.execute(sql);
+            statement.close();
+            System.out.println("-----Таблицю 'categories' успішно створено-------");
+
+        }catch(Exception ex) {
+            System.out.println("Помилка підключення: "+ex.getMessage());
+        }
     }
 
     private static void sortPerson() {
@@ -65,8 +120,6 @@ public class Main {
         Random random = new Random();
         return random.nextInt(max-min)+min;
     }
-
-
 
     private static void inputData() {
         Scanner scanner = new Scanner(System.in);
