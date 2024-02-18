@@ -3,6 +3,7 @@ package org.example;
 import org.example.entities.CategoryEntity;
 import org.example.repositories.CategoryRepository;
 import org.example.storage.StorageProperties;
+import org.example.storage.StorageService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,8 +22,9 @@ public class Main {
     }
 
     @Bean
-    CommandLineRunner runner(CategoryRepository categoryRepository) {
+    CommandLineRunner runner(CategoryRepository categoryRepository, StorageService storageService) {
         return args -> {
+            storageService.init();
 //            CategoryEntity category = new CategoryEntity();
 //            category.setName("Продукти");
 //            category.setDescription("Для усіх людей");
