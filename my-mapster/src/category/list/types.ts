@@ -4,3 +4,14 @@ export interface ICategoryItem {
     description: string;
     image: string;
 }
+
+export interface IGetCategories {
+    content: ICategoryItem[],
+    totalElements: number
+}
+
+export interface ICategorySearch{
+    name: string,
+    page: number,
+    size: number
+}

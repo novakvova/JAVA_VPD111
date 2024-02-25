@@ -9,6 +9,8 @@ import org.example.mapper.CategoryMapper;
 import org.example.repositories.CategoryRepository;
 import org.example.storage.FileSaveFormat;
 import org.example.storage.StorageService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -94,5 +96,13 @@ public class CategoryController {
         catch (Exception exception) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<CategoryItemDTO>> searchByName(@RequestParam(required = false) String name,
+                                                              Pageable pageable) {
+        Page<CategoryEntity> categories = categoryRepository.findByNameContainingIgnoreCase(name, pageable);
+        Page<CategoryItemDTO> result = categories.map(categoryMapper::categoryItemDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
