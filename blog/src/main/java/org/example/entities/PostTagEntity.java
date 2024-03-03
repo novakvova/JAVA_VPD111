@@ -9,12 +9,12 @@ import lombok.Data;
 @IdClass(PostTagPK.class)
 public class PostTagEntity {
     @Id
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="post_id", nullable = false)
     private PostEntity post;
 
     @Id
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="tag_id", nullable = false)
     private TagEntity tag;
 }

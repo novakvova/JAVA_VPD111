@@ -3,6 +3,7 @@ package org.example.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -23,5 +24,5 @@ public class TagEntity {
     private String description;
 
     @OneToMany(mappedBy = "tag")
-    private List<PostTagEntity> postTags;
+    private List<PostTagEntity> postTags = new ArrayList<>();
 }

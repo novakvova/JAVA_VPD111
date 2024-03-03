@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -38,11 +39,11 @@ public class PostEntity {
 
     private LocalDateTime modified;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(name="category_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private CategoryEntity category;
 
     @OneToMany(mappedBy = "post")
-    private List<PostTagEntity> postTags;
+    private List<PostTagEntity> postTags = new ArrayList<>();
 }

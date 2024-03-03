@@ -21,6 +21,6 @@ public class CategoryEntity {
     @Column(length = 200)
     private String description;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.ALL)
     private List<PostEntity> posts;
 }
