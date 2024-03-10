@@ -1,11 +1,10 @@
 package org.example.services;
 
 import com.github.javafaker.Faker;
+import org.example.constants.Roles;
 import org.example.entities.*;
-import org.example.respositories.CategoryRepository;
-import org.example.respositories.PostRepository;
-import org.example.respositories.PostTagRepository;
-import org.example.respositories.TagRepository;
+import org.example.respositories.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,15 +18,28 @@ public class DatabaseSeeder {
     private final PostTagRepository postTagRepository;
     private final TagRepository tagRepository;
 
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final PasswordEncoder passwordEncoder;
+
     public DatabaseSeeder(CategoryRepository categoryRepository,
                           PostRepository postRepository,
                           PostTagRepository postTagRepository,
-                          TagRepository tagRepository) {
+                          TagRepository tagRepository,
+
+                          RoleRepository roleRepository,
+                          UserRepository userRepository,
+                          UserRoleRepository userRoleRepository,
+                          PasswordEncoder passwordEncoder) {
         this.categoryRepository = categoryRepository;
         this.postRepository = postRepository;
         this.postTagRepository = postTagRepository;
         this.tagRepository = tagRepository;
-
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.passwordEncoder = passwordEncoder;
         faker = new Faker(new Locale("uk"));
     }
 
@@ -36,10 +48,13 @@ public class DatabaseSeeder {
         seedTags(10);
         generatePosts(20);
         generatePostTags(5);
+
+        seedRole();
+        seedUser();
     }
 
     private void seedCategories(int n) {
-        if (categoryRepository.count() < 10) {
+        if (categoryRepository.count() < n) {
             for (int i = 0; i < n; i++) {
                 CategoryEntity category = new CategoryEntity();
                 category.setName(faker.commerce().department());
@@ -51,7 +66,7 @@ public class DatabaseSeeder {
     }
 
     private void seedTags(int n) {
-        if (tagRepository.count() < 10) {
+        if (tagRepository.count() < n) {
             for (int i = 0; i < n; i++) {
                 TagEntity tag = new TagEntity();
                 tag.setName(faker.lorem().word());
@@ -63,7 +78,7 @@ public class DatabaseSeeder {
     }
 
     public void generatePosts(int count) {
-        if (postRepository.count() < 10) {
+        if (postRepository.count() < count) {
             var categories = categoryRepository.findAll();
             for (int i = 0; i < count; i++) {
                 PostEntity post = new PostEntity();
@@ -81,13 +96,51 @@ public class DatabaseSeeder {
     }
 
     public void generatePostTags(int count) {
-        var posts = postRepository.findAll();
-        var tags = tagRepository.findAll();
-        for (int i = 0; i < count; i++) {
-            PostTagEntity postTag = new PostTagEntity();
-            postTag.setTag(tags.get(faker.random().nextInt(tags.size())));
-            postTag.setPost(posts.get(faker.random().nextInt(posts.size())));
-            postTagRepository.save(postTag);
+        if (postTagRepository.count() < count) {
+            var posts = postRepository.findAll();
+            var tags = tagRepository.findAll();
+            for (int i = 0; i < count; i++) {
+                PostTagEntity postTag = new PostTagEntity();
+                postTag.setTag(tags.get(faker.random().nextInt(tags.size())));
+                postTag.setPost(posts.get(faker.random().nextInt(posts.size())));
+                postTagRepository.save(postTag);
+            }
+        }
+    }
+
+    private void seedRole() {
+        if(roleRepository.count() == 0) {
+            RoleEntity admin = RoleEntity
+                    .builder()
+                    .name(Roles.Admin)
+                    .build();
+            roleRepository.save(admin);
+            RoleEntity user = RoleEntity
+                    .builder()
+                    .name(Roles.User)
+                    .build();
+            roleRepository.save(user);
+        }
+    }
+
+    private void seedUser() {
+        if(userRepository.count() == 0) {
+            var user = UserEntity
+                    .builder()
+                    .email("admin@gmail.com")
+                    .firstName("Микола")
+                    .lastName("Підкаблучник")
+                    .phone("+380 97 67 56 464")
+                    .password(passwordEncoder.encode("123456"))
+                    .build();
+            userRepository.save(user);
+            var role = roleRepository.findByName(Roles.Admin);
+            var ur = UserRoleEntity
+                    .builder()
+                    .role(role)
+                    .user(user)
+                    .build();
+            userRoleRepository.save(ur);
         }
     }
 }

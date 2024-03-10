@@ -17,7 +17,6 @@ public class Main {
     CommandLineRunner runner(DatabaseSeeder init) {
         return args -> {
             init.SeedAllTables();
-
         };
     }
 }
